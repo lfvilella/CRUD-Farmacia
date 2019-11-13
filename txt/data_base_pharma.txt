@@ -1,0 +1,16 @@
+123
+Dorflex
+2.50
+5
+S
+Anti-inflamatorio
+issei
+
+321
+Paracetamol
+1.50
+3
+N
+naosei
+issei
+
