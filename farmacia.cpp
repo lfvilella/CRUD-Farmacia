@@ -1,9 +1,11 @@
 # include <stdio.h>
+# include <stdlib.h>
 # include <string.h>
 
 void limpa_tela();
 void menu();
 void le_dados();
+void cadastro(int codigo, char *remedio, float preco, int quantidade, char generico, char *categoria, char *fabricante);
 
 int main(){
     menu();
@@ -47,66 +49,43 @@ void le_dados(){
         printf("Fabricante: "); 
         getchar();
         fgets(fabricante, 255, stdin);
+
+        cadastro(codigo_remedio, nome_do_remedio, preco, quantidade, generico, categoria, fabricante);
     }
 }
 
 void menu(){
     int opcao = 1;  
-    printf("1 - Cadastrar\n");
-    printf("2 - Consultar\n");
-    printf("3 - Alterar\n");
-    printf("4 - Remover\n");
-    printf("5 - Exibir\n");
-    printf("0 - Exit\n");
-
-    scanf("%d", &opcao);
     while (opcao != 0){
+        limpa_tela();
+        printf("1 - Cadastrar\n");
+        printf("2 - Consultar\n");
+        printf("3 - Alterar\n");
+        printf("4 - Remover\n");
+        printf("5 - Exibir\n");
+        printf("0 - Exit\n");
+        printf("Escolha uma das opções: ");
+        scanf("%d", &opcao);
         switch (opcao){
             case 1:
                 le_dados();
-                // cadastrar();
                 break;
         }
-        limpa_tela();
-        printf("Escolha uma das opções: ");
-        scanf("%d", &opcao);
     }
 }
 
-// int cadastro(char *remedio, int tipo_do_mercado, int codigo, float preco){
-//     FILE *file;
-//     switch (tipo_do_mercado){
-//         case 1:
-//             file = fopen("txt/mercado1.txt", "a");
-//             if (!file){
-//                 printf("Erro ao abrir arquivo.\n");
-//                 return 0;
-//             }
-//             fprintf(file, "%d|%.2f|%s", codigo, preco, remedio);
-//             break;
-//         case 2:
-//             file = fopen("txt/mercado2.txt", "a");
-//             if (!file){
-//                 printf("Erro ao abrir arquivo.\n");
-//                 return 0;
-//             }
-//             fprintf(file, "%d|%.2f|%s", codigo, preco, remedio);
-//             break;
-//         case 3:
-//             file = fopen("txt/mercado3.txt", "a");
-//             if (!file){
-//                 printf("Erro ao abrir arquivo.\n");
-//                 return 0;
-//             }
-//             fprintf(file, "%d|%.2f|%s", codigo, preco, remedio);
-//             break;
-    
-//         default:
-//             break;
-//     }
-//     fclose(file);
-// }
+void cadastro(int codigo, char *remedio, float preco, int quantidade, char generico, char *categoria, char *fabricante){
+    FILE *file = fopen("txt/data_base_pharma.txt", "a");
+    if (!file){
+        printf("Erro ao abrir arquivo.\n");
+        return;
+    }
+    // It will be saved like this: codigo|remedio|preco|quantidade|generico|categoria|fabricante
+    fprintf(file, "%d\n%s%.2f\n%d\n%c\n%s%s\n", codigo, remedio, preco, quantidade, generico, categoria, fabricante);
+    fclose(file);
+}
 
 void limpa_tela(){
-    clsc();
+    system("clear");
+    // Or system("CLS"); for windows
 }
