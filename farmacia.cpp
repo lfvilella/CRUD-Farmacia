@@ -6,6 +6,7 @@ void limpa_tela();
 void menu();
 void le_dados();
 void cadastro(int codigo, char *remedio, float preco, int quantidade, char generico, char *categoria, char *fabricante);
+void exibir_dados();
 
 int main(){
     menu();
@@ -25,6 +26,7 @@ void le_dados(){
     printf("Quantidade a ser cadastrada: "); scanf("%d", &quantia_produtos_cadastrado);
 
     for (int idx = 0; idx < quantia_produtos_cadastrado; idx++){
+        printf("\n*** Produto %d ***\n", idx+1);
         printf("Codigo: "); 
         scanf("%d", &codigo_remedio);
 
@@ -70,6 +72,9 @@ void menu(){
             case 1:
                 le_dados();
                 break;
+            case 5:
+                exibir_dados();
+                break;
         }
     }
 }
@@ -83,6 +88,22 @@ void cadastro(int codigo, char *remedio, float preco, int quantidade, char gener
     // It will be saved like this: codigo|remedio|preco|quantidade|generico|categoria|fabricante
     fprintf(file, "%d\n%s%.2f\n%d\n%c\n%s%s\n", codigo, remedio, preco, quantidade, generico, categoria, fabricante);
     fclose(file);
+}
+
+void exibir_dados(){
+    FILE *file = fopen("txt/data_base_pharma.txt", "r");
+    if (!file){
+        printf("Erro ao abrir arquivo.\n");
+        return;
+    }
+    char c;
+    while ((c = fgetc(file)) != EOF){
+        printf("%c", c);
+    }
+
+    int take_break = 0;
+    printf("\nPress any key to back to menu: ");
+    scanf("%d", &take_break);
 }
 
 void limpa_tela(){
