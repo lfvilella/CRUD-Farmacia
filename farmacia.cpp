@@ -27,6 +27,8 @@ void consultar();
 void remover_dados();
 void data_copy(FILE *file1, FILE *file2); // Copia o 1 para o 2
 void verifica_file(FILE *file);
+void backup();
+void delete_all();
 
 int main(){
     menu();
@@ -62,6 +64,12 @@ void menu(){
                 break;
             case 5:
                 exibir_dados();
+                break;
+            case 6:
+                backup();
+                break;
+            case 7:
+                delete_all();
                 break;
             case 0:
                 return;
@@ -219,6 +227,36 @@ void remover_dados(){
     fclose(file_aux);
 }
 
+void backup(){
+    file = fopen("txt/data_base_pharma.txt", "rb");
+    FILE *file_backup = fopen("txt/data_base_backup", "ab");
+    verifica_file(file);
+    verifica_file(file_backup);
+
+    data_copy(file, file_backup);
+
+    printf("Backup was successful!\n");
+    take_a_break();
+
+    fclose(file);
+    fclose(file_backup);
+}
+
+void delete_all(){
+    file = fopen("txt/data_base_pharma.txt", "rb");
+    if (file){
+        remove("txt/data_base_pharma.txt");
+        printf("Database was successfully deleted!\n");
+        take_a_break();
+        fclose(file);
+    }
+    else{
+        printf("File inexistente.\n");
+        take_a_break();
+    }
+}
+
+// *************************** SUB FUCTIONS *************************** //
 void data_copy(FILE *file1, FILE *file2){
     char c;
 
