@@ -2,25 +2,64 @@
 # include <stdlib.h>
 # include <string.h>
 
+// STRUCT //
+typedef struct Pharma_Products{
+    int codigo;
+    char nome[50];
+    float preco;
+    int quantidade;
+    char generico; // S ou N
+    char categoria[50];
+    char fabricante[50];
+}Farmacia;
+
+// FUNCTIONS //
 void limpa_tela();
+void take_a_break();
 void menu();
 void le_dados();
-void cadastro(int codigo, char *remedio, float preco, int quantidade, char generico, char *categoria, char *fabricante);
+void cadastro(Farmacia pharma);
 void exibir_dados();
+void consultar();
 
 int main(){
     menu();
     return 0;
 }
 
+void menu(){
+    int opcao = 1;
+    do {
+        limpa_tela();
+
+        printf("1 - Cadastrar\n");
+        printf("2 - Consultar\n");
+        printf("3 - Alterar\n");
+        printf("4 - Remover\n");
+        printf("5 - Exibir\n");
+        printf("0 - Exit\n");
+
+        printf("Escolha uma das opções: ");
+        scanf("%d", &opcao);
+        switch (opcao){
+            case 1:
+                le_dados();
+                break;
+            case 2:
+                consultar();
+                break;
+            case 5:
+                exibir_dados();
+                break;
+            case 0:
+                return;
+                break;
+        }
+    }while (opcao >= 0 || opcao <= 5);
+}
+
 void le_dados(){
-    int codigo_remedio;
-    char nome_do_remedio[255];
-    float preco;
-    int quantidade;
-    char generico; // S ou N
-    char categoria[255];
-    char fabricante[255];
+    Farmacia pharma;
 
     int quantia_produtos_cadastrado;
     printf("Quantidade a ser cadastrada: "); scanf("%d", &quantia_produtos_cadastrado);
@@ -28,65 +67,51 @@ void le_dados(){
     for (int idx = 0; idx < quantia_produtos_cadastrado; idx++){
         printf("\n*** Produto %d ***\n", idx+1);
         printf("Codigo: "); 
-        scanf("%d", &codigo_remedio);
+        scanf("%d", &pharma.codigo);
 
         printf("Nome do remédio: "); 
         getchar();
-        fgets(nome_do_remedio, 255, stdin);
+        fgets(pharma.nome, 50, stdin);
 
         printf("Preço: "); 
-        scanf("%f", &preco);
+        scanf("%f", &pharma.preco);
 
         printf("Quantidade: "); 
-        scanf("%d", &quantidade);
+        scanf("%d", &pharma.quantidade);
 
         printf("Genério (S/N): "); 
         getchar();
-        scanf("%c", &generico);
+        scanf("%c", &pharma.generico);
 
         printf("Categoria: "); 
         getchar();
-        fgets(categoria, 255, stdin);
+        fgets(pharma.categoria, 50, stdin);
 
         printf("Fabricante: "); 
         getchar();
-        fgets(fabricante, 255, stdin);
+        fgets(pharma.fabricante, 50, stdin);
 
-        cadastro(codigo_remedio, nome_do_remedio, preco, quantidade, generico, categoria, fabricante);
+        cadastro(pharma);
     }
 }
 
-void menu(){
-    int opcao = 1;  
-    while (opcao != 0){
-        limpa_tela();
-        printf("1 - Cadastrar\n");
-        printf("2 - Consultar\n");
-        printf("3 - Alterar\n");
-        printf("4 - Remover\n");
-        printf("5 - Exibir\n");
-        printf("0 - Exit\n");
-        printf("Escolha uma das opções: ");
-        scanf("%d", &opcao);
-        switch (opcao){
-            case 1:
-                le_dados();
-                break;
-            case 5:
-                exibir_dados();
-                break;
-        }
-    }
-}
-
-void cadastro(int codigo, char *remedio, float preco, int quantidade, char generico, char *categoria, char *fabricante){
+void cadastro(Farmacia pharma){
     FILE *file = fopen("txt/data_base_pharma.txt", "a");
     if (!file){
         printf("Erro ao abrir arquivo.\n");
+        take_a_break();
         return;
     }
-    // It will be saved like this: codigo|remedio|preco|quantidade|generico|categoria|fabricante
-    fprintf(file, "%d\n%s%.2f\n%d\n%c\n%s%s\n", codigo, remedio, preco, quantidade, generico, categoria, fabricante);
+    int resultado;
+    resultado = fwrite(&pharma, sizeof(Farmacia), 1, file);
+    if (resultado){
+        printf("Item cadastrado com sucesso!.\n");
+        take_a_break();
+    }
+    else{
+        printf("Item não cadastrado, infelizmente.\n");
+        take_a_break();
+    }
     fclose(file);
 }
 
@@ -94,19 +119,38 @@ void exibir_dados(){
     FILE *file = fopen("txt/data_base_pharma.txt", "r");
     if (!file){
         printf("Erro ao abrir arquivo.\n");
+        take_a_break();
         return;
     }
-    char c;
-    while ((c = fgetc(file)) != EOF){
-        printf("%c", c);
+    Farmacia pharma;
+
+    printf("\n*** Remédios no DataBase ***\n");
+    while (fread(&pharma, sizeof(Farmacia), 1, file)){
+        printf("Codigo: %d\n", pharma.codigo);
+        printf("Nome do Remedio: %s", pharma.nome);
+        printf("Preco: %.2f\n", pharma.preco);
+        printf("Quantidade em Estoque: %d\n", pharma.quantidade);
+        printf("Generico: %c\n", pharma.generico);
+        printf("Categoria: %s", pharma.categoria);
+        printf("Fabricante: %s\n", pharma.fabricante);
     }
 
-    int take_break = 0;
-    printf("\nPress any key to back to menu: ");
-    scanf("%d", &take_break);
+    take_a_break();
+    fclose(file);
+}
+
+void consultar(int codigo){
+
 }
 
 void limpa_tela(){
     system("clear");
     // Or system("CLS"); for windows
+}
+
+void take_a_break(){
+    getchar();
+    char take_break;
+    printf("Type any key to continue: ");
+    scanf("%c", &take_break);
 }
