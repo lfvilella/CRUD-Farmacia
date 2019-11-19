@@ -25,6 +25,7 @@ void le_dados();
 void cadastro(Farmacia pharma);
 void exibir_dados();
 void consultar();
+void alterar_dados();
 void remover_dados();
 void data_copy(FILE *file1, FILE *file2); // Copia o 1 para o 2
 void verifica_file(FILE *file);
@@ -59,6 +60,9 @@ void menu(){
                 break;
             case 2:
                 consultar();
+                break;
+            case 3:
+                alterar_dados();
                 break;
             case 4:
                 remover_dados();
@@ -188,6 +192,61 @@ void consultar(){
     fclose(file);
 }
 
+void alterar_dados(){
+    file = fopen("txt/data_base_pharma.txt", "r+b");  
+    verifica_file(file);
+
+    Farmacia pharma;
+
+    int code_to_change;
+    printf("Insira o código do remedio para alterar: "); scanf("%d", &code_to_change);
+
+    bool find_out;
+    while (fread(&pharma, sizeof(pharma), 1, file)){
+        if (code_to_change == pharma.codigo){
+            printf("Codigo: %d -- Produto: %s -- Quantidade: %d -- Valor: %.2f\n", pharma.codigo, pharma.nome, pharma.quantidade, pharma.preco);
+            find_out = true;
+
+            fseek(file, sizeof(Farmacia)*-1, SEEK_CUR);
+            printf("\nDigite as novas alterações: \n");
+            printf("Codigo: "); 
+            scanf("%d", &pharma.codigo);
+
+            printf("Nome do remédio: "); 
+            fflush(stdin);
+            fgets(pharma.nome, 50, stdin);
+
+            printf("Preço: "); 
+            scanf("%f", &pharma.preco);
+
+            printf("Quantidade: "); 
+            scanf("%d", &pharma.quantidade);
+
+            printf("Genério (S/N): "); 
+            fflush(stdin);
+            scanf("%c", &pharma.generico);
+
+            printf("Categoria: "); 
+            fflush(stdin);
+            fgets(pharma.categoria, 50, stdin);
+
+            printf("Fabricante: "); 
+            fflush(stdin);
+            fgets(pharma.fabricante, 50, stdin);
+
+            fwrite(&pharma, sizeof(pharma), 1, file);
+            fseek(file, sizeof(pharma)* 0, SEEK_END);
+            return;
+        }
+    }
+
+    if (!find_out){
+        printf ("\\nCodigo nao cadastrado!!\\n");
+    }
+
+    fclose(file);
+}
+
 void remover_dados(){
     Farmacia pharma;
 
@@ -227,9 +286,9 @@ void remover_dados(){
 
     if(!find_out){
         printf("\nCodigo não cadastrado.\n");
+        take_a_break();
     }
-
-    take_a_break();
+    
     fclose(file);
 }
 
