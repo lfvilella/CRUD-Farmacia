@@ -144,7 +144,7 @@ void exibir_dados(){
 
     printf("\n*** Remédios no DataBase ***\n");
     while (fread(&pharma, sizeof(Farmacia), 1, file)){
-        // if (pharma.deletado != '*'){ // So mostra os nao deletados
+        if (pharma.deletado != '*'){ // So mostra os nao deletados
             printf("Codigo: %d\n", pharma.codigo);
             printf("Nome do Remedio: %s", pharma.nome);
             printf("Preco: %.2f\n", pharma.preco);
@@ -152,8 +152,8 @@ void exibir_dados(){
             printf("Generico: %c\n", pharma.generico);
             printf("Categoria: %s", pharma.categoria);
             printf("Fabricante: %s\n", pharma.fabricante);
-            printf("Ativo: %c\n\n", pharma.deletado);
-        // }
+            // printf("Ativo: %c\n\n", pharma.deletado);
+        }
     }
 
     take_a_break();
