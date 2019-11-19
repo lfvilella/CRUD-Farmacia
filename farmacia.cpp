@@ -204,7 +204,10 @@ void alterar_dados(){
     bool find_out;
     while (fread(&pharma, sizeof(pharma), 1, file)){
         if (code_to_change == pharma.codigo){
-            printf("Codigo: %d -- Produto: %s -- Quantidade: %d -- Valor: %.2f\n", pharma.codigo, pharma.nome, pharma.quantidade, pharma.preco);
+            printf("Codigo: %d\n", pharma.codigo);
+            printf("Produto: %s", pharma.nome);
+            printf("Quantidade: %d\n", pharma.quantidade);
+            printf("Valor: %.2f\n", pharma.preco);
             find_out = true;
 
             fseek(file, sizeof(Farmacia)*-1, SEEK_CUR);
