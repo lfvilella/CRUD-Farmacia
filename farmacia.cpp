@@ -14,6 +14,7 @@ typedef struct Pharma_Products{
     char generico; // S ou N
     char categoria[50];
     char fabricante[50];
+    char deletado; // deletado = '*' / nao deletado = ' '
 }Farmacia;
 
 // FUNCTIONS //
@@ -90,7 +91,7 @@ void le_dados(){
         scanf("%d", &pharma.codigo);
 
         printf("Nome do remédio: "); 
-        getchar();
+        fflush(stdin);
         fgets(pharma.nome, 50, stdin);
 
         printf("Preço: "); 
@@ -100,15 +101,15 @@ void le_dados(){
         scanf("%d", &pharma.quantidade);
 
         printf("Genério (S/N): "); 
-        getchar();
+        fflush(stdin);
         scanf("%c", &pharma.generico);
 
         printf("Categoria: "); 
-        getchar();
+        fflush(stdin);
         fgets(pharma.categoria, 50, stdin);
 
         printf("Fabricante: "); 
-        getchar();
+        fflush(stdin);
         fgets(pharma.fabricante, 50, stdin);
 
         cadastro(pharma);
@@ -133,19 +134,22 @@ void cadastro(Farmacia pharma){
 }
 
 void exibir_dados(){
-    file = fopen("txt/data_base_pharma.txt", "r");
+    file = fopen("txt/data_base_pharma.txt", "rb");
     verifica_file(file);
     Farmacia pharma;
 
     printf("\n*** Remédios no DataBase ***\n");
     while (fread(&pharma, sizeof(Farmacia), 1, file)){
-        printf("Codigo: %d\n", pharma.codigo);
-        printf("Nome do Remedio: %s", pharma.nome);
-        printf("Preco: %.2f\n", pharma.preco);
-        printf("Quantidade em Estoque: %d\n", pharma.quantidade);
-        printf("Generico: %c\n", pharma.generico);
-        printf("Categoria: %s", pharma.categoria);
-        printf("Fabricante: %s\n", pharma.fabricante);
+        // if (pharma.deletado != '*'){ // So mostra os nao deletados
+            printf("Codigo: %d\n", pharma.codigo);
+            printf("Nome do Remedio: %s", pharma.nome);
+            printf("Preco: %.2f\n", pharma.preco);
+            printf("Quantidade em Estoque: %d\n", pharma.quantidade);
+            printf("Generico: %c\n", pharma.generico);
+            printf("Categoria: %s", pharma.categoria);
+            printf("Fabricante: %s\n", pharma.fabricante);
+            printf("Ativo: %c\n\n", pharma.deletado);
+        // }
     }
 
     take_a_break();
@@ -163,7 +167,7 @@ void consultar(){
 
     bool find_out;
     while (fread(&pharma, sizeof(Farmacia), 1, file)){
-        if (pharma.codigo == code_to_search){
+        if ((pharma.codigo == code_to_search) && (pharma.deletado != '*')){
             printf("Codigo: %d\n", pharma.codigo);
             printf("Nome do Remedio: %s", pharma.nome);
             printf("Preco: %.2f\n", pharma.preco);
@@ -185,46 +189,48 @@ void consultar(){
 }
 
 void remover_dados(){
+    Farmacia pharma;
+
     printf("\nPara auxiliar na vizualiação, vamos listar os remedios! \n");
     exibir_dados();
+
+    file = fopen("txt/data_base_pharma.txt", "r+b");  
+    verifica_file(file);
 
     int code_to_remove;
     printf("Insira o código do remedio a ser removido: "); scanf("%d", &code_to_remove);
 
-    file = fopen("txt/data_base_pharma.txt", "rb");
-    FILE *file_aux = fopen("txt/data_base_pharma_aux.txt", "wb");
-    
-    verifica_file(file);
-    verifica_file(file_aux);
+    char sure;
+    bool find_out;
+    while (fread(&pharma, sizeof(pharma), 1, file)){
+        if (code_to_remove == pharma.codigo){
+            printf("*** PRODUTO ***\n");
+            printf("Codigo: %d -- Produto: %s -- Quantidade: %d -- Valor: %.2f\n", pharma.codigo, pharma.nome, pharma.quantidade, pharma.preco);
+            find_out = true;
 
-    Farmacia pharma;
-
-    char c;
-    // Não posso jogar no data_copy() por causa do if
-    while((c = getc(file)) != EOF){
-        if (pharma.codigo == code_to_remove){
-            printf("Removendo...");
-        }
-        else{
-            fprintf(file_aux, "%c", c);
+            printf("Are you sure? (t/f): "); 
+            fflush(stdin);
+            scanf("%c", &sure);
+            if (sure == 't'){
+                pharma.deletado = '*';
+                printf("\n\nProduto excluido com Sucesso! \n\n");
+                fseek(file, sizeof(Farmacia)*-1, SEEK_CUR);
+                fwrite(&pharma, sizeof(pharma), 1, file);
+                fseek(file, sizeof(pharma)* 0, SEEK_END);
+                return;
+            }
+            else if (sure == 'f'){
+                return;
+            }
         }
     }
-    fclose(file);
-    fclose(file_aux);
-    // ------------- //
 
-    // VOLTANDO DADOS PARA O ARQUIVO PRINCIPAL:
-    file = fopen("txt/data_base_pharma.txt", "wb");
-    file_aux = fopen("txt/data_base_pharma_aux.txt", "rb");
-    verifica_file(file);
-    verifica_file(file_aux);
-
-    data_copy(file_aux, file);
+    if(!find_out){
+        printf("\nCodigo não cadastrado.\n");
+    }
 
     take_a_break();
-
     fclose(file);
-    fclose(file_aux);
 }
 
 void backup(){
