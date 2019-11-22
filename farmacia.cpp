@@ -86,7 +86,7 @@ void menu(){
                 return;
                 break;
         }
-    }while (opcao >= 0 || opcao <= 5);
+    }while (opcao >= 0 || opcao <= 8);
 }
 
 void le_dados(){
