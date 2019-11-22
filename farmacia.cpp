@@ -44,17 +44,19 @@ void menu(){
         fflush(stdin); // Limpa o buffer para evitar algum erro.
         limpa_tela();
 
-        printf("1 - Cadastrar\n");
-        printf("2 - Consultar\n");
-        printf("3 - Alterar\n");
-        printf("4 - Remover\n");
-        printf("5 - Exibir\n");
-        printf("6 - Backup\n");
-        printf("7 - Deletar Tudo\n");
-        printf("8 - Vendas\n");
-        printf("0 - Sair\n");
+        printf("********************\n");
+        printf("* 1 - Cadastrar    *\n");
+        printf("* 2 - Consultar    *\n");
+        printf("* 3 - Alterar      *\n");
+        printf("* 4 - Remover      *\n");
+        printf("* 5 - Exibir       *\n");
+        printf("* 6 - Backup       *\n");
+        printf("* 7 - Deletar Tudo *\n");
+        printf("* 8 - Vendas       *\n");
+        printf("* 0 - Sair         *\n");
+        printf("********************\n");
 
-        printf("Escolha uma das opções: ");
+        printf("\nEscolha uma das opções: ");
         scanf("%d", &opcao);
         printf("\n");
         switch (opcao){
@@ -149,7 +151,9 @@ void exibir_dados(){
     verifica_file(file);
     Farmacia pharma;
 
-    printf("\n*** Remédios no DataBase ***\n");
+    printf("\n********************************\n");
+    printf("** Remédios no Banco de Dados **\n");
+    printf("********************************\n\n");
     while (fread(&pharma, sizeof(Farmacia), 1, file)){
         if (pharma.deletado != '*'){ // So mostra os nao deletados
             printf("Codigo: %d\n", pharma.codigo);
@@ -162,6 +166,8 @@ void exibir_dados(){
             // printf("Ativo: %c\n\n", pharma.deletado);
         }
     }
+    printf("********************************\n");
+    printf("********************************\n\n");
 
     take_a_break();
     fclose(file);
