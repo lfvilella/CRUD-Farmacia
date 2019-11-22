@@ -27,6 +27,7 @@ void exibir_dados();
 void consultar();
 void alterar_dados();
 void remover_dados();
+void sales();
 void data_copy(FILE *file1, FILE *file2); // Copia o 1 para o 2
 void verifica_file(FILE *file);
 void backup();
@@ -40,18 +41,22 @@ int main(){
 void menu(){
     int opcao = 1;
     do {
+        fflush(stdin); // Limpa o buffer para evitar algum erro.
         limpa_tela();
 
-        printf("1 - Cadastrar\n");
-        printf("2 - Consultar\n");
-        printf("3 - Alterar\n");
-        printf("4 - Remover\n");
-        printf("5 - Exibir\n");
-        printf("6 - Backup\n");
-        printf("7 - Delete All\n");
-        printf("0 - Exit\n");
+        printf("********************\n");
+        printf("* 1 - Cadastrar    *\n");
+        printf("* 2 - Consultar    *\n");
+        printf("* 3 - Alterar      *\n");
+        printf("* 4 - Remover      *\n");
+        printf("* 5 - Exibir       *\n");
+        printf("* 6 - Backup       *\n");
+        printf("* 7 - Deletar Tudo *\n");
+        printf("* 8 - Vendas       *\n");
+        printf("* 0 - Sair         *\n");
+        printf("********************\n");
 
-        printf("Escolha uma das opções: ");
+        printf("\nEscolha uma das opções: ");
         scanf("%d", &opcao);
         printf("\n");
         switch (opcao){
@@ -74,13 +79,17 @@ void menu(){
                 backup();
                 break;
             case 7:
+                backup();
                 delete_all();
+                break;
+            case 8:
+                sales();
                 break;
             case 0:
                 return;
                 break;
         }
-    }while (opcao >= 0 || opcao <= 5);
+    }while (opcao >= 0 || opcao <= 8);
 }
 
 void le_dados(){
@@ -138,11 +147,13 @@ void cadastro(Farmacia pharma){
 }
 
 void exibir_dados(){
-    file = fopen("txt/data_base_pharma.txt", "rb");
+    file = fopen("txt/data_base_pharma.txt", "r+b");
     verifica_file(file);
     Farmacia pharma;
 
-    printf("\n*** Remédios no DataBase ***\n");
+    printf("\n********************************\n");
+    printf("** Remédios no Banco de Dados **\n");
+    printf("********************************\n\n");
     while (fread(&pharma, sizeof(Farmacia), 1, file)){
         if (pharma.deletado != '*'){ // So mostra os nao deletados
             printf("Codigo: %d\n", pharma.codigo);
@@ -155,6 +166,8 @@ void exibir_dados(){
             // printf("Ativo: %c\n\n", pharma.deletado);
         }
     }
+    printf("********************************\n");
+    printf("********************************\n\n");
 
     take_a_break();
     fclose(file);
@@ -203,7 +216,7 @@ void alterar_dados(){
 
     bool find_out;
     while (fread(&pharma, sizeof(pharma), 1, file)){
-        if (code_to_change == pharma.codigo){
+        if (code_to_change == pharma.codigo && pharma.deletado != '*'){
             printf("Codigo: %d\n", pharma.codigo);
             printf("Produto: %s", pharma.nome);
             printf("Quantidade: %d\n", pharma.quantidade);
@@ -244,7 +257,8 @@ void alterar_dados(){
     }
 
     if (!find_out){
-        printf ("\\nCodigo nao cadastrado!!\\n");
+        printf ("\nCodigo nao cadastrado!!\n");
+        take_a_break();
     }
 
     fclose(file);
@@ -267,7 +281,10 @@ void remover_dados(){
     while (fread(&pharma, sizeof(pharma), 1, file)){
         if (code_to_remove == pharma.codigo){
             printf("*** PRODUTO ***\n");
-            printf("Codigo: %d -- Produto: %s -- Quantidade: %d -- Valor: %.2f\n", pharma.codigo, pharma.nome, pharma.quantidade, pharma.preco);
+            printf("Codigo: %d\n", pharma.codigo);
+            printf("Produto: %s", pharma.nome);
+            printf("Quantidade: %d\n", pharma.quantidade);
+            printf("Valor: %.2f\n", pharma.preco);
             find_out = true;
 
             printf("Are you sure? (t/f): "); 
@@ -303,7 +320,7 @@ void backup(){
 
     data_copy(file, file_backup);
 
-    printf("Backup was successful!\n");
+    printf("Backup foi realizdo com sucesso!\n");
     take_a_break();
 
     fclose(file);
@@ -314,14 +331,52 @@ void delete_all(){
     file = fopen("txt/data_base_pharma.txt", "rb");
     if (file){
         remove("txt/data_base_pharma.txt");
-        printf("Database was successfully deleted!\n");
+        printf("O banco de dados foi deletado com sucesso!\n");
         take_a_break();
         fclose(file);
     }
     else{
-        printf("File inexistente.\n");
+        printf("Arquivo inexistente.\n");
         take_a_break();
     }
+}
+
+void sales(){
+    file = fopen("txt/data_base_pharma.txt", "r+b");  
+    verifica_file(file);
+
+    Farmacia pharma;
+
+    int code_to_sale;
+    printf("Insira o código do remedio para realizar a venda: "); scanf("%d", &code_to_sale);
+
+    bool find_out;
+    while (fread(&pharma, sizeof(pharma), 1, file)){
+        if (code_to_sale == pharma.codigo && pharma.deletado != '*'){
+            printf("Codigo: %d\n", pharma.codigo);
+            printf("Produto: %s", pharma.nome);
+            printf("Quantidade: %d\n", pharma.quantidade);
+            printf("Valor: %.2f\n", pharma.preco);
+            find_out = true;
+
+            fseek(file, sizeof(Farmacia)*-1, SEEK_CUR);
+            printf("Insira a quantidade à vender: : ");
+            int quantidade_venda;
+            scanf("%d", &quantidade_venda);
+            pharma.quantidade = (pharma.quantidade)-quantidade_venda;
+
+            fwrite(&pharma, sizeof(pharma), 1, file);
+            fseek(file, sizeof(pharma)* 0, SEEK_END);
+            return;
+        }
+    }
+
+    if (!find_out){
+        printf ("\nCodigo nao cadastrado!!\n");
+        take_a_break();
+    }
+
+    fclose(file);
 }
 
 // *************************** SUB FUCTIONS *************************** //
@@ -349,6 +404,6 @@ void limpa_tela(){
 void take_a_break(){
     getchar();
     char take_break;
-    printf("Type any key to continue: ");
+    printf("Pressione qualquer tecla para continuar: ");
     scanf("%c", &take_break);
 }
