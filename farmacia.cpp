@@ -77,6 +77,7 @@ void menu(){
                 backup();
                 break;
             case 7:
+                backup();
                 delete_all();
                 break;
             case 8:
