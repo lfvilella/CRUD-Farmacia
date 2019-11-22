@@ -50,9 +50,9 @@ void menu(){
         printf("4 - Remover\n");
         printf("5 - Exibir\n");
         printf("6 - Backup\n");
-        printf("7 - Delete All\n");
-        printf("8 - Sales\n");
-        printf("0 - Exit\n");
+        printf("7 - Deletar Tudo\n");
+        printf("8 - Vendas\n");
+        printf("0 - Sair\n");
 
         printf("Escolha uma das opções: ");
         scanf("%d", &opcao);
@@ -250,7 +250,8 @@ void alterar_dados(){
     }
 
     if (!find_out){
-        printf ("\\nCodigo nao cadastrado!!\\n");
+        printf ("\nCodigo nao cadastrado!!\n");
+        take_a_break();
     }
 
     fclose(file);
@@ -312,7 +313,7 @@ void backup(){
 
     data_copy(file, file_backup);
 
-    printf("Backup was successful!\n");
+    printf("Backup foi realizdo com sucesso!\n");
     take_a_break();
 
     fclose(file);
@@ -323,12 +324,12 @@ void delete_all(){
     file = fopen("txt/data_base_pharma.txt", "rb");
     if (file){
         remove("txt/data_base_pharma.txt");
-        printf("Database was successfully deleted!\n");
+        printf("O banco de dados foi deletado com sucesso!\n");
         take_a_break();
         fclose(file);
     }
     else{
-        printf("File inexistente.\n");
+        printf("Arquivo inexistente.\n");
         take_a_break();
     }
 }
@@ -396,6 +397,6 @@ void limpa_tela(){
 void take_a_break(){
     getchar();
     char take_break;
-    printf("Type any key to continue: ");
+    printf("Pressione qualquer tecla para continuar: ");
     scanf("%c", &take_break);
 }
