@@ -287,10 +287,10 @@ void remover_dados(){
             printf("Valor: %.2f\n", pharma.preco);
             find_out = true;
 
-            printf("Are you sure? (t/f): "); 
+            printf("Você tem certeza? (v/f): "); 
             fflush(stdin);
             scanf("%c", &sure);
-            if (sure == 't'){
+            if (sure == 'v'){
                 pharma.deletado = '*';
                 printf("\n\nProduto excluido com Sucesso! \n\n");
                 fseek(file, sizeof(Farmacia)*-1, SEEK_CUR);
