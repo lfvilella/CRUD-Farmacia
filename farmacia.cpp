@@ -22,6 +22,7 @@ void limpa_tela();
 void take_a_break();
 void menu();
 void le_dados();
+int verifica_codigo(int code_to_search);
 void cadastro(Farmacia pharma);
 void exibir_dados();
 void consultar();
@@ -102,6 +103,10 @@ void le_dados(){
         printf("\n*** Produto %d ***\n", idx+1);
         printf("Codigo: "); 
         scanf("%d", &pharma.codigo);
+        while (verifica_codigo(pharma.codigo) == 0){
+            printf("Codigo: "); 
+            scanf("%d", &pharma.codigo);
+        }
 
         printf("Nome do remédio: "); 
         fflush(stdin);
@@ -126,7 +131,25 @@ void le_dados(){
         fgets(pharma.fabricante, 50, stdin);
 
         cadastro(pharma);
+        printf("Codigo já existente.\n");
     }
+}
+
+int verifica_codigo(int code_to_search){
+    file = fopen("txt/data_base_pharma.txt", "rb");
+    verifica_file(file);
+
+    Farmacia pharma;
+
+    while (fread(&pharma, sizeof(Farmacia), 1, file)){
+        if ((pharma.codigo == code_to_search) && (pharma.deletado != '*')){
+            printf("Codigo ja existente! \n");
+            take_a_break();
+            return 0;
+        }
+    }
+    fclose(file);
+    return 1;
 }
 
 void cadastro(Farmacia pharma){
@@ -363,7 +386,13 @@ void sales(){
             printf("Insira a quantidade à vender: : ");
             int quantidade_venda;
             scanf("%d", &quantidade_venda);
-            pharma.quantidade = (pharma.quantidade)-quantidade_venda;
+            if (pharma.quantidade > quantidade_venda){
+                pharma.quantidade = (pharma.quantidade)-quantidade_venda;
+            }
+            else{
+                printf("Estoque indisponivel!\n");
+                take_a_break();
+            }
 
             fwrite(&pharma, sizeof(pharma), 1, file);
             fseek(file, sizeof(pharma)* 0, SEEK_END);
